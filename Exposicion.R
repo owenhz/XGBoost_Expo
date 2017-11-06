@@ -1,0 +1,21 @@
+install.packages("xgboost")
+install.packages("caret")
+install.packages("MLmetrics")
+library(xgboost)
+library(caret)
+library(MLmetrics)
+datos<-read.csv("F:/creditcard.csv")
+str(datos)
+dim(datos)
+datos2<-datos[,-31]
+datos2<-as.matrix(datos2)
+datos2<-xgb.DMatrix(datos2,label=datos[,31])
+xgb_cv<-xgb.cv(data = datos2,nrounds=5,nfold=4)
+xgb_cv<-xgb.cv(data=datos2,nrounds=35,nfold=4,objetive="binary:logistic",eval_metric="auc")
+modeloxgb<-xgboost(datos2,nrounds=5,objetive="binary:logistic",eval_metric="auc")
+importancia<-xgb.importance(colnames(datos2),modeloxgb)
+gb.plot.importance(importancia)
+predicciones<-predict(modeloxgb,datos2,probability=TRUE)
+g<-Gini(predicciones,datos$Class)
+
+ 
